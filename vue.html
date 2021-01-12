@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>jQuery to Vue.js</title>
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div id="app">
+                <div>
+                    <h1>jQuery to Vue.js example</h1>
+                    <hr />
+                    <button id="fetch-users" class="btn btn-primary" v-on:click="fetchUsers">Fetch users</button>
+                    <input type="radio" id="women" name="drone" value="femmes" v-on:click="filterBy('female')">
+                    <label for="women">Femmes</label>
+                    <input type="radio" id="men" name="drone" value="hommes" v-on:click="filterBy('male')">
+                    <label for="men">Hommes</label>
+                </div>
+                <p>{{nbrUsers}}/20</p>
+                <h3 id="count-users"></h3>
+                <table id="tbl-users" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Tel</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-if="users.length > 0" v-for="user in users">
+                        <td><img v-bind:src="user.picture.thumbnail"></td>
+                        <td>{{user.name.first}} {{user.name.last}}</td>
+                        <td>{{user.email}}</td>
+                        <td>{{user.phone}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+        <script>
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    users: {},
+                    refUsers: {},
+                    nbrUsers: 0
+                },
+                methods: {
+                    fetchUsers: function () {
+                        axios.get('https://randomuser.me/api/?results=20').then(response => {
+                            // Associe le résultat à un tableau de référence
+                            this.refUsers = response.data.results;
+                            this.users = this.refUsers;
+                            this.nbrUsers = response.data.results.length;
+                        });
+
+                    },
+                    filterBy: function (gender) {
+                        // Filtre en fonction du genre pour afficher uniquement les users correspondant
+                        if (gender === 'female') {
+                            this.users = this.refUsers.filter(user => user.gender === 'female' );
+                        } else {
+                            this.users = this.refUsers.filter(user => user.gender === 'male');
+
+                        }
+
+                        // Recalcule le nombres d'users en fonction du genre
+                        this.nbrUsers = this.users.length;
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>
